@@ -40,9 +40,9 @@ export default class ClientAPI implements IClientAPI {
       url,
       method: "post",
       data: {
-        key,
-        level,
-        message
+        deviceId: key,
+        logType:level,
+        remark: message
       },
       headers: {
         Authorization: "Bearer " + instance.token

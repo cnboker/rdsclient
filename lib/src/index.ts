@@ -24,5 +24,5 @@ export {
     configer,
     webosApis,
     serviceRegister,
-    getService
+    getService,
 }

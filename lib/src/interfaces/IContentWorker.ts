@@ -5,6 +5,7 @@
 export interface IContentWorker {
     contentNotify: IContentNotify;
     execute(cb: () => void): void;
+    log(level: number, message: string): void;
 }
 
 export interface IContentNotify {
@@ -15,7 +16,7 @@ export interface IContentNotify {
     onSnapshot(callback: () => void): void;
 }
 
-export enum DownloadStatus{
+export enum DownloadStatus {
     Origin = 0,
     Success = 1,
     Failure = 2,
@@ -26,7 +27,7 @@ export interface IResourceInfo {
     resourceUrl: string,
     status?: DownloadStatus, //0 origin, 1 success, 2. failure, 3. begin
     ticket: number,
-    completed:boolean
+    completed: boolean
 }
 
 //资源下载器

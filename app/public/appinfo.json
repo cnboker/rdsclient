@@ -16,6 +16,7 @@
     "download.management",
     "systemsettings.query",
     "storageaccess.operation",
-    "devices"
+    "devices",
+    "surfacemanager.devutility"
   ]
 }

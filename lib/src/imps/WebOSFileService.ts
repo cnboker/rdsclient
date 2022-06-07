@@ -89,8 +89,28 @@ export function moveFile(originalPath: string, destinationPath: string): Promise
     bridge.call(url, params)
   })
 }
+//图片文件resize
+export function resize(path: string,  width: number): Promise<string> {
+  return new Promise((resolve, reject) => {
+    //@ts-ignore
+    const bridge = window.webosBridge
+    bridge.onservicecallback = (response: any) => {
+      console.log('resize response', response)
+      //var response = JSON.parse(msg);
+      const { returnValue, data, errorText } = response;
+      if (returnValue) {
+        resolve(data);
+      } else {
+        reject(errorText);
+      }
+    }
+    var url = "luna://com.ioliz.dc.app.fileservice/resize";
+    var params = JSON.stringify({ path, width });
+    bridge.call(url, params)
+  })
+}
 
-export function readFile(path: string): Promise<string> {
+export function readFile(path: string, encoding: string = 'utf-8'): Promise<string> {
   return new Promise((resolve, reject) => {
     //@ts-ignore
     var bridge = window.webosBridge;
@@ -104,7 +124,7 @@ export function readFile(path: string): Promise<string> {
       }
     }
     var url = "luna://com.ioliz.dc.app.fileservice/readFile";
-    var params = JSON.stringify({ path, encoding: 'utf-8' });
+    var params = JSON.stringify({ path, encoding });
     bridge.call(url, params)
   })
 }

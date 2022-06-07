@@ -10,4 +10,4 @@ echo build fileService
 # not support webpack
 Set-Location $root'/service/fileService' 
 npm run build 
-#cd /Users/scott/code/ioliz/lgclient/service/fileService && cp index.js package.json services.json ./dist 
+#cd /Users/scott/code/rdsclient/service/fileService && cp index.js package.json services.json ./dist 

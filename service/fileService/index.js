@@ -24,6 +24,7 @@ Oct 17 18:06:10 raspberrypi4 ls-hubd[1534]:     at Module.load (internal/modules
 Oct 17 18:06:10 raspberrypi4 ls-hubd[1534]:     at Function.Module._load (internal/modules/cjs/loader.js:708:14)
 Oct 17 18:06:10 raspberrypi4 ls-hubd[1534]:     at Module.require (internal/modules/cjs/loader.js:887:19)
 */
+
 const Service = require("webos-service");
 const pkgInfo = require("./package.json");
 const service = new Service(pkgInfo.name);
@@ -168,6 +169,25 @@ service.register("moveFile", function (message) {
       });
     }
   });
+});
+
+service.register("resize", function (message) {
+  var path = message.payload.path;
+  var width = message.payload.width || 1024;
+  const resize = require("./imageResize");
+  resize(path, width)
+    .then(function (data) {
+      message.respond({
+        returnValue: true,
+        data,
+      });
+    })
+    .catch(function (err) {
+      message.respond({
+        returnValue: false,
+        errorText: err,
+      });
+    });
 });
 
 // readFile

@@ -7,5 +7,6 @@ export interface IMQTTDispatcher{
   pubDownloadProgress(data:any):void;
   //接收新内容发布
   onSubContentNotify:(data:ContentPackage)=>void;
+  //接收截屏通知
   onSubSnapshotNotify:()=>void;
 }

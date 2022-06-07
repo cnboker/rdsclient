@@ -1,13 +1,14 @@
 import { IContentNotify } from "../interfaces/IContentWorker";
 import EventDispatcher from "./EventDispatcher";
-import { CONTENT_READY_EVENT, SNAPSHOT_EVENT } from '../constants'
+import { SNAPSHOT_EVENT } from '../constants'
 import { instance } from "../configer";
-import { ContentPackage } from "../dataModels/ContentPackage";
 import IClientAPI from "../interfaces/IClientAPI";
 import { getService } from "./ServiceProiver";
 import { IMQTTDispatcher } from "../interfaces/IMQTTDispatcher";
+import { screenCapture } from "../webosApis/surfaceservice";
+import { readFile, resize } from "./WebOSFileService";
 export default class ContentNotify implements IContentNotify {
-  private timeout: number = 1000 * 10;
+  private timeout: number = 1000 * 30;
   private dispatcher: EventDispatcher;
   private clientAPI: IClientAPI
 
@@ -19,7 +20,7 @@ export default class ContentNotify implements IContentNotify {
     this.dispatcher = new EventDispatcher();
     this.clientAPI = <IClientAPI>getService("IClientAPI");
     const mqttDispather = <IMQTTDispatcher>getService("IMQTTDispatcher");
-  
+
     mqttDispather.onSubSnapshotNotify = () => {
       this.snapshotProcess();
     }
@@ -36,42 +37,18 @@ export default class ContentNotify implements IContentNotify {
 
   snapshotProcess(): void {
     console.log("snapshotProcess call...");
-    this.doCapture().then(data => {
-      this.clientAPI.updateSnapshot(data);
-    });
+    const captureFile = '/tmp/capture.png'
+
+    screenCapture(captureFile).then(res => {
+      //read image file
+      return resize(captureFile, 800);
+    })
+      .then(base64 => {
+        this.clientAPI.updateSnapshot(base64);
+      })
+      .catch(error => {
+        console.log('scrrencapture', error)
+      })
   }
 
-  doCapture(): Promise<string> {
-    return new Promise((resolve, reject) => {
-      //@ts-ignore
-      var options = {
-        save: false, //not save local
-        thumbnail: false,
-        //@ts-ignore
-        //imgResolution: window.Signage.ImgResolution.HD
-      };
-
-      var successCB = function (cbObject: any) {
-        var size = cbObject.size;
-        var encoding = cbObject.encoding;
-        var data = cbObject.data;
-
-        console.log(" doCapture Got Data size:" + cbObject);
-        resolve(data);
-        //resolve("data:image/jpeg;base64," + data);
-      };
-
-      var failureCB = function (cbObject: any) {
-        var errorCode = cbObject.errorCode;
-        var errorText = cbObject.errorText;
-        var error = "Error Code [" + errorCode + "]: " + errorText;
-        console.log(error);
-        reject(error);
-      };
-      //@ts-ignore
-      var signage = new window.Signage();
-      //@ts-ignore
-      signage.captureScreen(successCB, failureCB, options);
-    });
-  }
 }

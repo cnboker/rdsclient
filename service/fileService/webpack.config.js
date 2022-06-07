@@ -19,6 +19,14 @@ module.exports = {
     filename: 'index.js',
     path: path.resolve(__dirname, 'dist')
   },
+  module: {
+    rules: [
+      {
+        test: /\.node$/,
+        loader: 'node-loader',
+      },
+    ],
+  },
   externals: {
     //必须这样写， 这样写编译后的代码为
     //module.exports = require("webos-service");

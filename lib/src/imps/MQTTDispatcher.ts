@@ -23,22 +23,22 @@ export class MQTTDispatcher implements IMQTTDispatcher {
     const self = this;
     this.client.on('connect', () => {
       console.log('mqtt connected...')
-      self.subscrible(MQTT_CONTENT_NOTIFY);
-      self.subscrible(MQTT_SNAPSHOT_NOTIFY);
+      self.subscrible(`${MQTT_CONTENT_NOTIFY}/${this.deviceId}`);
+      self.subscrible(`${MQTT_SNAPSHOT_NOTIFY}/${this.deviceId}`);
     })
     this.client.on('message', (title: string, message: any) => {
       console.log('mqtt message', title, String.fromCharCode(message))
-      var jsonObj = JSON.parse(message)
       if (title === `${MQTT_CONTENT_NOTIFY}/${this.deviceId}`) {
-        this.onSubContentNotify(jsonObj);
+        var jsonObj = JSON.parse(message)
+        this.onSubContentNotify && this.onSubContentNotify(jsonObj);
       } else if (title === `${MQTT_SNAPSHOT_NOTIFY}/${this.deviceId}`) {
-        this.onSubSnapshotNotify();
+        this.onSubSnapshotNotify && this.onSubSnapshotNotify();
       }
     })
   }
 
   private subscrible(messageId: string): void {
-    this.client.subscribe(`${messageId}/${this.deviceId}`, (err: any) => {
+    this.client.subscribe(messageId, (err: any) => {
       if (err) {
         console.log('err', err)
       }

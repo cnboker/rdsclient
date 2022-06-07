@@ -4,23 +4,31 @@ import {
   IResourceInfo,
   IFileDownloader
 } from "../interfaces/IContentWorker";
-import { readFile,exists } from "./WebOSFileService";
+import { readFile, exists } from "./WebOSFileService";
 import { getService } from "./ServiceProiver";
 import { IMQTTDispatcher } from "../interfaces/IMQTTDispatcher";
-import { APP_DIR, APP_DOWNLOAD_DIR, instance,isInTest } from "../configer";
+import { APP_DIR, APP_DOWNLOAD_DIR, instance, isInTest } from "../configer";
+import IClientAPI from "../interfaces/IClientAPI";
 
 export default class ContentWorker implements IContentWorker {
+
   contentNotify: IContentNotify;
   fileDownloader: IFileDownloader;
   mqttDispather: IMQTTDispatcher;
+  clientAPI: IClientAPI;
+  
+  log(level: number, message: string): void {
+    const clientAPI = <IClientAPI>getService("IClientAPI");
+    clientAPI.log(instance.deviceId, level, message)
+  }
 
   //callback defined
   execute(cb: { (): void }): void {
     this.contentNotify = <IContentNotify>getService("IContentNotify");
     this.fileDownloader = <IFileDownloader>getService("IFileDownloader");
     this.mqttDispather = <IMQTTDispatcher>getService("IMQTTDispatcher");
-    if(!isInTest){
-      this.mqttDispather.connect(instance.mqttServer,instance.deviceId);
+    if (!isInTest) {
+      this.mqttDispather.connect(instance.mqttServer, instance.deviceId);
     }
     this.mqttDispather.onSubContentNotify = (data) => {
       //fileServer:http://ip:port/scott
@@ -31,7 +39,7 @@ export default class ContentWorker implements IContentWorker {
       });
       this.download(fileList, cb)
     }
-  
+
     //如果上次下载未完成，读未下载数据继续下载
     readFile(`${APP_DIR}/downloadlist.json`)
       .then(text => JSON.parse(text))
@@ -40,8 +48,8 @@ export default class ContentWorker implements IContentWorker {
       }).catch(e => {
         console.log("read downloadlist.json", e);
       });
-      //检查index.html是否存在，如果存在则加载
-      exists(`${APP_DOWNLOAD_DIR}/index.html`)
+    //检查index.html是否存在，如果存在则加载
+    exists(`${APP_DOWNLOAD_DIR}/index.html`)
       .then((exists) => {
         exists && cb && cb()
       })
@@ -55,7 +63,7 @@ export default class ContentWorker implements IContentWorker {
       if (this.fileDownloader) {
         this.fileDownloader.cancel();
       }
-      this.fileDownloader.onDownloadComplete = (fileList:IResourceInfo[])=>{
+      this.fileDownloader.onDownloadComplete = (fileList: IResourceInfo[]) => {
         this.diskClean(fileList);
         if (cb) { cb(); }
       }
