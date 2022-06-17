@@ -126,8 +126,11 @@ export class FileDownloader implements IFileDownloader {
             console.log('downloadStatusQuery finished', item)
           }
         })
+        .catch(e=>{
+          clearInterval(timer)
+        })
       }
-    }, 1000);
+    }, 2000);
   }
 
   private async singleFileDownload(resource: IResourceInfo): Promise<void> {

@@ -59,7 +59,7 @@ export const download = (
 export const downloadStatusQuery = (
   ticket: number,
 ): Promise<downloadResult> => {
-  
+
   return new Promise((resolve, reject) => {
     //@ts-ignore
     var bridge = window.webosBridge;
@@ -70,17 +70,20 @@ export const downloadStatusQuery = (
         ticket,
         amountReceived,
         amountTotal,
-        completed
+        completed,
+        errorText
       } = response
-      
-      if(ticket === 0){
+
+      if (ticket === 0) {
         return
       }
       console.log("downloadStatusQuery", response, returnValue);
       if (completed) {
         resolve({ ticket, amountReceived, amountTotal, completed });
       }
-     
+      if (errorText) {
+        reject(errorText)
+      }
     };
     var url = "luna://com.webos.service.downloadmanager/downloadStatusQuery";
     var params = JSON.stringify({

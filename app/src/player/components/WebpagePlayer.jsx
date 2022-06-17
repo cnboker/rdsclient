@@ -23,6 +23,7 @@ export default ({ url }) => {
         display="initial"
         position="relative"
         scrolling="no"
+        allow="autoplay; fullscreen"
         allowtransparency="true"
         style={{
           frameBoarder: 0,
