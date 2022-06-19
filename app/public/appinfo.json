@@ -17,6 +17,10 @@
     "systemsettings.query",
     "storageaccess.operation",
     "devices",
-    "surfacemanager.devutility"
+    "surfacemanager.devutility",
+    "mediaindexer.operation",
+    "mediacontroller.query",
+    "media.operation",
+    "surfacemanager.query"
   ]
 }

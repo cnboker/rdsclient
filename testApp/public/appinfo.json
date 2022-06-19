@@ -11,6 +11,9 @@
     "activity.operation",
     "download.management",
     "systemsettings.query",
-    "storageaccess.operation"
+    "storageaccess.operation",
+    "mediaindexer.operation",
+    "media.operation",
+    "surfacemanager.query"
   ]
 }

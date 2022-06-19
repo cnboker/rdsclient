@@ -156,7 +156,7 @@ export function unzipFile(zipFilePath: string, extractToDirectoryPath: string): 
       var response = JSON.parse(msg);
       const { returnValue, errorText } = response;
       if (returnValue) {
-        resolve(returnValue);
+        resolve();
       } else {
         reject(errorText);
       }

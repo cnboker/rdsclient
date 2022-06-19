@@ -232,36 +232,16 @@ service.register("removeFile", function (message) {
 
 // unzipFile
 service.register("unzipFile", function (message) {
-  const unzip = require("unzip");
+  var { unzip } = require("./unzip");
+  const { zipFilePath, extractToDirectoryPath } = message.payload;
 
-  var zipFilePath = message.payload.zipFilePath;
-  var extractToDirectoryPath = message.payload.extractToDirectoryPath;
-
-  // createReadStream
-  var readStream = fs.createReadStream(zipFilePath);
-
-  // Error handling
-  readStream.on("error", function (err) {
-    message.respond({
-      returnValue: false,
-      errorCode: "unzipFile createReadStream ERROR",
-      errorText: err,
-    });
-  });
-
-  // Do unzip & End event
-  readStream
-    .pipe(
-      unzip.Extract({
-        path: extractToDirectoryPath,
-      })
-    )
-    .on("close", function (err) {
+  try {
+    unzip(zipFilePath, extractToDirectoryPath, function (err) {
       if (err) {
         message.respond({
           returnValue: false,
-          errorCode: "unzipFile Extract ERROR",
           errorText: err,
+          path: zipFilePath + "," + extractToDirectoryPath,
         });
       } else {
         message.respond({
@@ -269,6 +249,12 @@ service.register("unzipFile", function (message) {
         });
       }
     });
+  } catch (e) {
+    message.respond({
+      returnValue: false,
+      errorText: e.message
+    });
+  }
 });
 
 // writeFile

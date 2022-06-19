@@ -4,11 +4,12 @@ import {
   IResourceInfo,
   IFileDownloader
 } from "../interfaces/IContentWorker";
-import { readFile, exists } from "./WebOSFileService";
+import { readFile, exists, unzipFile } from "./WebOSFileService";
 import { getService } from "./ServiceProiver";
 import { IMQTTDispatcher } from "../interfaces/IMQTTDispatcher";
 import { APP_DIR, APP_DOWNLOAD_DIR, instance, isInTest } from "../configer";
 import IClientAPI from "../interfaces/IClientAPI";
+
 
 export default class ContentWorker implements IContentWorker {
 
@@ -16,7 +17,7 @@ export default class ContentWorker implements IContentWorker {
   fileDownloader: IFileDownloader;
   mqttDispather: IMQTTDispatcher;
   clientAPI: IClientAPI;
-  
+
   log(level: number, message: string): void {
     const clientAPI = <IClientAPI>getService("IClientAPI");
     clientAPI.log(instance.deviceId, level, message)
@@ -37,14 +38,23 @@ export default class ContentWorker implements IContentWorker {
         resourceUrl: `${x}`,
         status: 0
       });
-      this.download(fileList, cb)
+      //this.download(fileList, cb)
+      this.download(fileList, () => {
+        this.zipPipe(fileList).then(() => {
+          cb && cb()
+        })
+      })
     }
 
     //如果上次下载未完成，读未下载数据继续下载
     readFile(`${APP_DIR}/downloadlist.json`)
       .then(text => JSON.parse(text))
       .then(fileList => {
-        this.download(fileList, cb)
+        this.download(fileList, () => {
+          this.zipPipe(fileList).then(() => {
+            cb && cb()
+          })
+        })
       }).catch(e => {
         console.log("read downloadlist.json", e);
       });
@@ -57,6 +67,27 @@ export default class ContentWorker implements IContentWorker {
     this.contentNotify.watch();
   }
   //
+
+  zipPipe(fileList: IResourceInfo[]): Promise<IResourceInfo[]> {
+    if (fileList.length === 0) return Promise.resolve(fileList);
+    const item = fileList[0];
+    if (item.resourceUrl.lastIndexOf('.zip') > 0) {
+      const fileName = new URL(item.resourceUrl).pathname
+      console.log('zip file path', fileName)
+      return new Promise((resolve, reject) => {
+        unzipFile(`${APP_DOWNLOAD_DIR}${fileName}`, APP_DOWNLOAD_DIR)
+          .then(() => {
+            console.log(`${fileName} unzip is ok`)
+            resolve(fileList)
+          })
+          .catch(e => {
+            console.log('unzip error', e)
+            reject(e)
+          })
+      })
+    }
+    return Promise.resolve(fileList);
+  }
 
   download(fileList: IResourceInfo[], cb: { (): void }) {
     if (fileList.length > 0) {

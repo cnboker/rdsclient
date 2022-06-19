@@ -7,6 +7,7 @@ import * as webosFileService from './imps/WebOSFileService'
 import * as usbservice from './webosApis/usbservice'
 import * as applicationmanager from './webosApis/applicationmanager'
 import * as bootservice from './imps/bootservice'
+import * as mediaservice from './webosApis/mediaservice'
 import { serviceRegister, getService } from './imps/ServiceProiver'
 
 const webosApis = {
@@ -16,7 +17,8 @@ const webosApis = {
     webosFileService,
     usbservice,
     applicationmanager,
-    bootservice
+    bootservice,
+    mediaservice,
 }
 
 export {

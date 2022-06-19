@@ -3,6 +3,9 @@
   "version": "1.0.1",
   "description": "file service",
   "main": "index.js",
+  "overrides": {
+    "graceful-fs": "^4.2.9"
+  },
   "scripts": {
     "build": "webpack",
     "test": "jest"
@@ -10,15 +13,13 @@
   "author": "",
   "license": "BSD",
   "dependencies": {
-    "jimp": "^0.16.1",
-    "unzip": "^0.1.11"
+    "unzip-stream": "^0.3.1"
   },
   "devDependencies": {
     "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^9.0.1",
     "jest": "^28.1.0",
     "mocha": "^10.0.0",
-    "node-loader": "^2.0.0",
     "webpack": "^5.58.2",
     "webpack-cli": "^4.9.0"
   }
