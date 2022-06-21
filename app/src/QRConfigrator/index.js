@@ -54,6 +54,7 @@ export default () => {
     } else if (configInfo.fileServer && runStep === RunStep.RequestConfig) {
       setRunStep(() => RunStep.Finished);
       setMessage(() => "config finished!");
+      console.log('config info', configInfo);
       saveConfig();
       history.push("/play");
     }

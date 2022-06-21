@@ -2,6 +2,7 @@ require("dotenv").config();
 import { readFile, writeFile, removeFile, exists, mkdir } from "./imps/WebOSFileService";
 import { ConfigModel } from "./dataModels/ConfigModel"
 import { EventEmitter } from "fbemitter";
+import { APP_ID } from "./constants";
 
 class Configer {
   private static _instance: Configer;
@@ -16,7 +17,7 @@ class Configer {
     this._emitter.addListener("log", (type: EventType, message: string) => {
       console.log(`${type},${message}`);
     });
-    this.rootDirReady();
+    
   }
 
   read(): Promise<ConfigModel> {
@@ -36,28 +37,20 @@ class Configer {
     removeFile(`${APP_DIR}/config.json`);
   }
 
-  write(config: ConfigModel): Promise<boolean> {
+  async write(config: ConfigModel): Promise<boolean> {
     this._configInstance = config;
+    await this.rootDirReady();
     return writeFile(
       `${APP_DIR}/config.json`,
       JSON.stringify(config)
     );
   }
 
-  rootDirReady = () => {
-    exists(APP_DIR)
-      .then((exist) => {
-        if (!exist) {
-          return mkdir(APP_DIR);
-        }
-        return true;
-      })
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((e) => {
-        console.log("mkdsDir", e);
-      });
+  rootDirReady = async () => {
+    const exist = await exists(APP_DIR);
+    if(!exist){
+      await mkdir(APP_DIR)
+    }
   };
 
   get deviceId(): string {

@@ -1,5 +1,5 @@
 export function exists(path: string): Promise<boolean> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     //@ts-ignore
     var bridge = window.webosBridge;
     bridge.onservicecallback = (msg: string) => {
